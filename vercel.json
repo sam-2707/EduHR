@@ -1,0 +1,30 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "installCommand": "npm install",
+  "env": {
+    "GROQ_API_KEY": "@groq-api-key",
+    "NEXTAUTH_SECRET": "@nextauth-secret",
+    "NEXTAUTH_URL": "@nextauth-url"
+  },
+  "build": {
+    "env": {
+      "GROQ_API_KEY": "@groq-api-key",
+      "NEXTAUTH_SECRET": "@nextauth-secret", 
+      "NEXTAUTH_URL": "@nextauth-url"
+    }
+  },
+  "functions": {
+    "app/api/**/*.ts": {
+      "runtime": "nodejs18.x",
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    }
+  ]
+}

@@ -20,9 +20,19 @@
 # production
 /build
 
-# misc
+# local env files
+.env*.local
+.env.local
+.env
 .DS_Store
 *.pem
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
 
 # debug
 npm-debug.log*

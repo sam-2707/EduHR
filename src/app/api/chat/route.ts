@@ -31,35 +31,38 @@ export async function POST(request: NextRequest) {
       schoolId: schoolId || 'demo-school'
     }
 
-    // Create or get chat session (with fallback)
+    // Create or get chat session (with fallback for production)
     let session = null
     try {
-      session = await prisma.chatSession.findFirst({
-        where: {
-          userId: context.employeeId || 'demo-user',
-          userRole: 'ADMIN'
-        },
-        orderBy: { updatedAt: 'desc' }
-      })
-
-      if (!session) {
-        session = await prisma.chatSession.create({
-          data: {
+      // Only attempt database operations if DATABASE_URL is configured
+      if (process.env.DATABASE_URL) {
+        session = await prisma.chatSession.findFirst({
+          where: {
             userId: context.employeeId || 'demo-user',
-            userRole: 'ADMIN',
-            schoolId: context.schoolId || 'demo-school'
+            userRole: 'ADMIN'
+          },
+          orderBy: { updatedAt: 'desc' }
+        })
+
+        if (!session) {
+          session = await prisma.chatSession.create({
+            data: {
+              userId: context.employeeId || 'demo-user',
+              userRole: 'ADMIN',
+              schoolId: context.schoolId || 'demo-school'
+            }
+          })
+        }
+
+        // Save user message
+        await prisma.chatMessage.create({
+          data: {
+            sessionId: session.id,
+            content: message,
+            role: 'USER'
           }
         })
       }
-
-      // Save user message
-      await prisma.chatMessage.create({
-        data: {
-          sessionId: session.id,
-          content: message,
-          role: 'USER'
-        }
-      })
     } catch (dbError) {
       console.warn('Database operations failed, continuing without persistence:', dbError)
     }
