@@ -32,15 +32,28 @@ NEXTAUTH_URL=https://your-app-name.vercel.app
    - Select `hr-guru-platform` repository
 
 3. **Configure Environment Variables**
-   ```bash
-   GROQ_API_KEY=gsk_your_actual_groq_api_key
-   NEXTAUTH_SECRET=your_32_character_random_string
-   NEXTAUTH_URL=https://your-app-name.vercel.app
-   ```
+   - Go to your project settings in Vercel dashboard
+   - Click "Environment Variables" tab
+   - Add these variables one by one:
+   
+   **Variable Name**: `GROQ_API_KEY`
+   **Value**: `gsk_your_actual_groq_api_key_here`
+   **Environment**: All (Production, Preview, Development)
+   
+   **Variable Name**: `NEXTAUTH_SECRET`
+   **Value**: `your_32_character_random_string`
+   **Environment**: All (Production, Preview, Development)
+   
+   **Variable Name**: `NEXTAUTH_URL`
+   **Value**: `https://your-app-name.vercel.app`
+   **Environment**: Production only (update after first deployment)
 
 4. **Deploy**
-   - Click "Deploy"
+   - Click "Deploy" button
    - Wait for build completion (~2-3 minutes)
+   - **Note**: The first deployment might show the app without environment variables
+   - Add environment variables in project settings after first deployment
+   - Redeploy to activate all features
 
 ### Option 2: Deploy via Vercel CLI
 
@@ -124,23 +137,35 @@ NEXTAUTH_URL=https://your-app-name.vercel.app
 
 ### Common Issues:
 
-1. **Build Failures**
+1. **Environment Variable Errors During Build**
+   ```
+   Environment Variable 'GROQ_API_KEY' references Secret 'groq-api-key', which does not exist.
+   ```
+   **Solution**: 
+   - Deploy first without environment variables
+   - Add environment variables in Vercel dashboard after deployment
+   - Redeploy to activate features
+   - Don't use `@secret-name` format in environment variables
+
+2. **Build Failures**
    ```bash
    # If TypeScript errors occur
    npm run type-check
    ```
 
-2. **Environment Variable Issues**
-   - Ensure all required variables are set
-   - Check variable names match exactly
+3. **Environment Variable Issues**
+   - Ensure all required variables are set in Vercel dashboard
+   - Check variable names match exactly (case-sensitive)
    - Redeploy after adding variables
+   - Use "All Environments" for most variables
 
-3. **API Route Issues**
+4. **API Route Issues**
    - Verify `/api/chat` endpoint works
-   - Check GROQ_API_KEY is valid
+   - Check GROQ_API_KEY is valid and properly set
    - Monitor function logs in Vercel dashboard
+   - AI chat will show fallback message if API key is missing
 
-4. **Styling Issues**
+5. **Styling Issues**
    - Clear browser cache
    - Check Tailwind CSS compilation
    - Verify responsive breakpoints
