@@ -42,7 +42,7 @@ import {
   Area,
   AreaChart
 } from 'recharts'
-import { motion } from 'framer-motion'
+
 
 interface AnalyticsMetric {
   id: string
@@ -463,10 +463,10 @@ export default function HRAnalyticsDashboard() {
           </div>
 
           {/* Performance Trends */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+          <div
+}
+}
+}
           >
             <Card>
               <CardHeader>
@@ -518,14 +518,14 @@ export default function HRAnalyticsDashboard() {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
 
           {/* Department Performance & Recruitment Funnel */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+            <div
+}
+}
+}
             >
               <Card>
                 <CardHeader>
@@ -551,12 +551,12 @@ export default function HRAnalyticsDashboard() {
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
+            <div
+}
+}
+}
             >
               <Card>
                 <CardHeader>
@@ -584,7 +584,7 @@ export default function HRAnalyticsDashboard() {
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           </div>
         </div>
       )}
