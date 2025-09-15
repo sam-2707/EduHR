@@ -1,0 +1,371 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model School {
+  id          String   @id @default(cuid())
+  name        String
+  code        String   @unique
+  address     String?
+  phone       String?
+  email       String?
+  board       BoardType
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  teachers    Teacher[]
+  staff       Staff[]
+  departments Department[]
+  leaves      Leave[]
+  payrolls    Payroll[]
+  applications Application[]
+  
+  @@map("schools")
+}
+
+model Teacher {
+  id              String    @id @default(cuid())
+  employeeId      String    @unique
+  firstName       String
+  lastName        String
+  email           String    @unique
+  phone           String?
+  dateOfBirth     DateTime?
+  joiningDate     DateTime
+  qualification   String[]
+  subjects        String[]
+  grades          String[]
+  cetScore        Float?
+  bedDegree       Boolean   @default(false)
+  medDegree       Boolean   @default(false)
+  experience      Int       @default(0)
+  salary          Float
+  employmentType  EmploymentType
+  status          TeacherStatus @default(ACTIVE)
+  
+  // Compliance
+  aadhaar         String?
+  pan             String?
+  policeVerified  Boolean   @default(false)
+  pocsoCertified  Boolean   @default(false)
+  
+  // Relations
+  schoolId        String
+  school          School    @relation(fields: [schoolId], references: [id])
+  departmentId    String?
+  department      Department? @relation(fields: [departmentId], references: [id])
+  
+  leaves          Leave[]
+  attendances     Attendance[]
+  payrolls        Payroll[]
+  performances    Performance[]
+  applications    Application[]
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@map("teachers")
+}
+
+model Staff {
+  id              String    @id @default(cuid())
+  employeeId      String    @unique
+  firstName       String
+  lastName        String
+  email           String    @unique
+  phone           String?
+  designation     String
+  salary          Float
+  joiningDate     DateTime
+  
+  // Relations
+  schoolId        String
+  school          School    @relation(fields: [schoolId], references: [id])
+  
+  leaves          Leave[]
+  attendances     Attendance[]
+  payrolls        Payroll[]
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@map("staff")
+}
+
+model Department {
+  id          String    @id @default(cuid())
+  name        String
+  code        String
+  hodId       String?
+  
+  // Relations
+  schoolId    String
+  school      School    @relation(fields: [schoolId], references: [id])
+  teachers    Teacher[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@unique([schoolId, code])
+  @@map("departments")
+}
+
+model Application {
+  id              String    @id @default(cuid())
+  firstName       String
+  lastName        String
+  email           String
+  phone           String
+  position        String
+  subjects        String[]
+  qualification   String[]
+  experience      Int
+  cetScore        Float?
+  resumeUrl       String?
+  
+  // AI Scoring
+  aiScore         Float?
+  aiRanking       Int?
+  aiAnalysis      Json?
+  
+  status          ApplicationStatus @default(SUBMITTED)
+  
+  // Relations
+  schoolId        String?
+  school          School?   @relation(fields: [schoolId], references: [id])
+  teacherId       String?
+  teacher         Teacher?  @relation(fields: [teacherId], references: [id])
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@map("applications")
+}
+
+model Leave {
+  id              String    @id @default(cuid())
+  type            LeaveType
+  startDate       DateTime
+  endDate         DateTime
+  days            Int
+  reason          String
+  status          LeaveStatus @default(PENDING)
+  approvedBy      String?
+  approvedAt      DateTime?
+  
+  // Relations - Polymorphic (Teacher or Staff)
+  teacherId       String?
+  teacher         Teacher?  @relation(fields: [teacherId], references: [id])
+  staffId         String?
+  staff           Staff?    @relation(fields: [staffId], references: [id])
+  schoolId        String
+  school          School    @relation(fields: [schoolId], references: [id])
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@map("leaves")
+}
+
+model Attendance {
+  id              String    @id @default(cuid())
+  date            DateTime
+  checkIn         DateTime?
+  checkOut        DateTime?
+  status          AttendanceStatus
+  
+  // Relations - Polymorphic (Teacher or Staff)
+  teacherId       String?
+  teacher         Teacher?  @relation(fields: [teacherId], references: [id])
+  staffId         String?
+  staff           Staff?    @relation(fields: [staffId], references: [id])
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@unique([teacherId, date])
+  @@unique([staffId, date])
+  @@map("attendances")
+}
+
+model Payroll {
+  id              String    @id @default(cuid())
+  month           Int
+  year            Int
+  basicSalary     Float
+  allowances      Float     @default(0)
+  deductions      Float     @default(0)
+  pfDeduction     Float     @default(0)
+  esiDeduction    Float     @default(0)
+  tdsDeduction    Float     @default(0)
+  professionalTax Float     @default(0)
+  netSalary       Float
+  status          PayrollStatus @default(PENDING)
+  
+  // Relations - Polymorphic (Teacher or Staff)
+  teacherId       String?
+  teacher         Teacher?  @relation(fields: [teacherId], references: [id])
+  staffId         String?
+  staff           Staff?    @relation(fields: [staffId], references: [id])
+  schoolId        String
+  school          School    @relation(fields: [schoolId], references: [id])
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@unique([teacherId, month, year])
+  @@unique([staffId, month, year])
+  @@map("payrolls")
+}
+
+model Performance {
+  id              String    @id @default(cuid())
+  period          String    // "2024-Q1", "2024-Annual"
+  studentScores   Float?
+  parentFeedback  Float?
+  attendance      Float?
+  punctuality     Float?
+  overallRating   Float?
+  
+  // AI Analysis
+  aiInsights      Json?
+  recommendations String[]
+  riskScore       Float?    // For attrition prediction
+  
+  // Relations
+  teacherId       String
+  teacher         Teacher   @relation(fields: [teacherId], references: [id])
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@unique([teacherId, period])
+  @@map("performances")
+}
+
+model ChatSession {
+  id              String    @id @default(cuid())
+  userId          String    // Employee ID
+  userRole        UserRole
+  schoolId        String?
+  
+  messages        ChatMessage[]
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id              String    @id @default(cuid())
+  content         String
+  role            MessageRole
+  
+  // AI Context
+  intent          String?
+  entities        Json?
+  response        Json?
+  
+  // Relations
+  sessionId       String
+  session         ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime  @default(now())
+  
+  @@map("chat_messages")
+}
+
+// Enums
+enum BoardType {
+  CBSE
+  ICSE
+  STATE_BOARD
+  IB
+  IGCSE
+}
+
+enum EmploymentType {
+  PERMANENT
+  CONTRACTUAL
+  TEMPORARY
+  SUBSTITUTE
+}
+
+enum TeacherStatus {
+  ACTIVE
+  INACTIVE
+  RESIGNED
+  TERMINATED
+}
+
+enum ApplicationStatus {
+  SUBMITTED
+  SCREENING
+  INTERVIEW_SCHEDULED
+  INTERVIEWED
+  SELECTED
+  REJECTED
+  HIRED
+}
+
+enum LeaveType {
+  SICK
+  CASUAL
+  EARNED
+  MATERNITY
+  PATERNITY
+  LTC
+  MEDICAL
+  EMERGENCY
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  HALF_DAY
+  LATE
+  ON_LEAVE
+}
+
+enum PayrollStatus {
+  PENDING
+  PROCESSED
+  PAID
+  CANCELLED
+}
+
+enum UserRole {
+  PRINCIPAL
+  HR_HEAD
+  HOD
+  TEACHER
+  STAFF
+  ADMIN
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
