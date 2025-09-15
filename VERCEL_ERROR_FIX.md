@@ -1,35 +1,31 @@
-# 🚨 Vercel Environment Variable Error - FIXED!
+# 🚨 Vercel Deployment Errors - FIXED!
 
-## Error Message:
-```
-Environment Variable 'GROQ_API_KEY' references Secret 'groq-api-key', which does not exist.
-```
+## Error Messages:
+1. ```
+   Environment Variable 'GROQ_API_KEY' references Secret 'groq-api-key', which does not exist.
+   ```
+2. ```
+   Error: Function Runtimes must have a valid version, for example `now-php@1.0.0`.
+   ```
 
-## ✅ **SOLUTION - Error Has Been Fixed!**
+## ✅ **SOLUTION - All Errors Fixed!**
 
-I've updated the `vercel.json` configuration to remove the problematic secret references. The deployment should now work properly.
+I've updated the `vercel.json` configuration to resolve both deployment errors.
 
 ## 🔧 **What Was Fixed:**
 
-### Before (Problematic):
+### Final Working Configuration:
 ```json
 {
-  "env": {
-    "GROQ_API_KEY": "@groq-api-key",
-    "NEXTAUTH_SECRET": "@nextauth-secret",
-    "NEXTAUTH_URL": "@nextauth-url"
-  }
-}
-```
-
-### After (Fixed):
-```json
-{
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next", 
   "framework": "nextjs"
 }
 ```
+
+### Issues Resolved:
+1. **Removed secret references** that don't exist
+2. **Removed invalid runtime specifications** 
+3. **Simplified to minimal working config** for Next.js 15
+4. **Let Vercel auto-detect** optimal settings
 
 ## 🚀 **Corrected Deployment Process:**
 
